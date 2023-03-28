@@ -23,6 +23,48 @@ class userDbEntry:
         self.password = row['password']
         self.balance = float(row['balance'])
 
+class dbIO:
+    def __init__(self, csvPath):
+        self.csvPath = csvPath
+    
+    def checkLogin(self, username, password):
+        with open(self.csvPath, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    if row['password'] == password:
+                        return userDbEntry(row)
+            return False
+
+    def createLogin(self, username, password):
+        with open(self.csvPath, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            newId = None
+
+            uniqueIdFound = False
+            while not uniqueIdFound:
+                newId = randint(10000000, 99999999)
+
+                isUnique = True
+                for row in reader:
+                    if row['username'] == username:
+                        return False
+                    if row['id'] == newId:
+                        isUnique = False
+                        break
+                
+                if isUnique:
+                    uniqueIdFound = True
+
+        newUserData = [newId, username, password, 0]
+        with open(self.csvPath, 'a') as csvfile:
+            writer_object = csv.writer(csvfile)
+            writer_object.writerow(newUserData)
+        
+        return True
+
+csvIO = dbIO('db/data.csv')
+
 root = tk.Tk()
 root.geometry("600x400")
 
@@ -34,44 +76,8 @@ userField = bEntry(loginFrame)
 pwLabel = tk.Label(loginFrame, text="Password")
 pwField = bEntry(loginFrame, show="*")
 
-def checkLogin(username, password):
-    with open('db/data.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row['username'] == username:
-                if row['password'] == password:
-                    return userDbEntry(row)
-        return False
-
-def createLogin(username, password):
-    with open('db/data.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        newId = None
-
-        uniqueIdFound = False
-        while not uniqueIdFound:
-            newId = randint(10000000, 99999999)
-
-            isUnique = True
-            for row in reader:
-                if row['username'] == username:
-                    return False
-                if row['id'] == newId:
-                    isUnique = False
-                    break
-            
-            if isUnique:
-                uniqueIdFound = True
-
-    newUserData = [newId, username, password, 0]
-    with open('db/data.csv', 'a') as csvfile:
-        writer_object = csv.writer(csvfile)
-        writer_object.writerow(newUserData)
-    
-    return True
-
 def handleLogin():
-    result = checkLogin(userField.get(), pwField.get())
+    result = csvIO.checkLogin(userField.get(), pwField.get())
 
     if not result:
         tkinter.messagebox.showerror(title="", message="Incorrect username or password!\nIf you have not yet created an account, press create one below.")
@@ -83,7 +89,7 @@ def handleLogin():
     pwField.delete(0, 'end')
 
 def handleCreate():
-    result = createLogin(userField.get(), pwField.get())
+    result = csvIO.createLogin(userField.get(), pwField.get())
     if not result:
         tkinter.messagebox.showerror(title="", message="That username is already taken. Please choose another.")
     else:
