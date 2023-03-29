@@ -33,7 +33,7 @@ def HomeLoop(userDb):
             case 'deposit':
                 switchFrame = DepositFrame(root, userDb)
             case 'withdraw':
-                pass
+                switchFrame = WithdrawFrame(root, userDb)
             case 'transfer':
                 pass
             case 'details':

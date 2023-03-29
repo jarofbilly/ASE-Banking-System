@@ -54,13 +54,17 @@ class HomeFrame(tk.Frame):
             self.switchTo = "deposit"
             self.destroy()
 
+        def handleWithdraw():
+            self.switchTo = "withdraw"
+            self.destroy()
+
         def handleLogout():
             self.switchTo = "logout"
             self.destroy()
 
         # Element creation.
         depositButton = bButton(self, text="Deposit", command=handleDeposit)
-        withdrawButton = bButton(self, text="Withdraw", command=handleDeposit)
+        withdrawButton = bButton(self, text="Withdraw", command=handleWithdraw)
         transferButton = bButton(self, text="Transfer", command=handleDeposit)
         detailsButton = bButton(self, text="View summary", command=handleDeposit)
         logoutButton = bButton(self, text="Log out", command=handleLogout)
@@ -104,4 +108,38 @@ class DepositFrame(tk.Frame):
         balLabel.grid(row=0, column=0, columnspan=2, pady=2)
         depositField.grid(row=1, column=0, columnspan=2, pady=2)
         depositButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
+        backButton.grid(row=4, column=0, columnspan=2, pady=2, sticky='ew')
+
+class WithdrawFrame(tk.Frame):
+    def __init__(self, parent=None, db=None, **config):
+        tk.Frame.__init__(self, parent, config)
+        self.userDb = db
+        self.switchTo = None
+
+        def handleWithdraw():
+            success = self.userDb.subBalance(float(withdrawField.get()))
+            if success:
+                tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
+                strBalance = "{:.2f}".format(self.userDb.balance)
+                balLabel.configure(text=f"Current Balance: £{strBalance}")
+            else:
+                tkinter.messagebox.showerror(title="", message="Failed to withdraw!")
+            withdrawField.delete(0, 'end')
+
+        def handleBack():
+            self.switchTo = 'main'
+            self.destroy()
+
+        # Element creation.
+        strBalance = "{:.2f}".format(self.userDb.balance)
+        balLabel = tk.Label(self, text=f"Current Balance: £{strBalance}")
+        withdrawField = bEntry(self)
+
+        withdrawButton = bButton(self, text="Withdraw", command=handleWithdraw)
+        backButton = bButton(self, text="Back to home", command=handleBack)
+
+        # Placement.
+        balLabel.grid(row=0, column=0, columnspan=2, pady=2)
+        withdrawField.grid(row=1, column=0, columnspan=2, pady=2)
+        withdrawButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
         backButton.grid(row=4, column=0, columnspan=2, pady=2, sticky='ew')
