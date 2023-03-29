@@ -58,6 +58,10 @@ class HomeFrame(tk.Frame):
             self.switchTo = "withdraw"
             self.destroy()
 
+        def handleDetails():
+            self.switchTo = "details"
+            self.destroy()
+
         def handleLogout():
             self.switchTo = "logout"
             self.destroy()
@@ -66,7 +70,7 @@ class HomeFrame(tk.Frame):
         depositButton = bButton(self, text="Deposit", command=handleDeposit)
         withdrawButton = bButton(self, text="Withdraw", command=handleWithdraw)
         transferButton = bButton(self, text="Transfer", command=handleDeposit)
-        detailsButton = bButton(self, text="View summary", command=handleDeposit)
+        detailsButton = bButton(self, text="View summary", command=handleDetails)
         logoutButton = bButton(self, text="Log out", command=handleLogout)
 
         # Placement.
@@ -143,3 +147,27 @@ class WithdrawFrame(tk.Frame):
         withdrawField.grid(row=1, column=0, columnspan=2, pady=2)
         withdrawButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
         backButton.grid(row=4, column=0, columnspan=2, pady=2, sticky='ew')
+
+class DetailsFrame(tk.Frame):
+    def __init__(self, parent=None, db=None, **config):
+        tk.Frame.__init__(self, parent, config)
+        self.userDb = db
+        self.switchTo = None
+
+        def handleBack():
+            self.switchTo = 'main'
+            self.destroy()
+
+        # Element creation.
+        strBalance = "{:.2f}".format(self.userDb.balance)
+        idLabel = tk.Label(self, text=f"ID number: {self.userDb.id}")
+        userLabel = tk.Label(self, text=f"Username: {self.userDb.username}")
+        balLabel = tk.Label(self, text=f"Current Balance: £{strBalance}")
+
+        backButton = bButton(self, text="Back to home", command=handleBack)
+
+        # Placement.
+        idLabel.grid(row=0, column=0, columnspan=2, pady=2)
+        userLabel.grid(row=1, column=0, columnspan=2, pady=2)
+        balLabel.grid(row=2, column=0, columnspan=2, pady=2)
+        backButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
