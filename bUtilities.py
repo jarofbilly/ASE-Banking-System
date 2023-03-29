@@ -82,16 +82,18 @@ class dbIO:
     def updateBalance(self, username, password, value):
         tempfile = NamedTemporaryFile(mode='w', delete=False)
         updated = False
+        fieldNames = ["id", "username", "password", "balance"]
 
         with open(self.csvPath, 'r') as csvfile, tempfile:
-            reader = csv.DictReader(csvfile)
-            writer = csv.DictWriter(tempfile)
+            reader = csv.DictReader(csvfile, fieldNames)
+            writer = csv.DictWriter(tempfile, fieldNames)
 
             for row in reader:
                 if row['username'] == username and row['password'] == password:
-                    row['balance'] == int(row['balance']) + value
-                    updated = int(row['balance'])
-                    row = {'id': row['id'], 'username': row['username'], 'password': row['password'], 'balance': row['balance']}
+                    row['balance'] = float(row['balance']) + value
+                    print(row['balance'])
+                    updated = float(row['balance'])
+                row = {'id': row['id'], 'username': row['username'], 'password': row['password'], 'balance': row['balance']}
                 writer.writerow(row)
         
         shutil.move(tempfile.name, self.csvPath)
