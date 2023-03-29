@@ -1,8 +1,3 @@
-id,username,password,balance
-12345678,bob,bob,10
-86030215,hi,hi,0
-83564268,billy,password,0
-93578560,admin,admin,0
-99085440,new,password,0
-28258694,apple,apple,0
-82307831,test,account,0
+id,username,password,balance
+11111111,hi,hi,62.900000000000006
+55818812,new,password,12.51

@@ -11,14 +11,13 @@ class LoginFrame(tk.Frame):
             result = db.checkLogin(userField.get(), pwField.get())
 
             if not result:
+                userField.delete(0, 'end')
+                pwField.delete(0, 'end')
                 tkinter.messagebox.showerror(title="", message="Incorrect username or password!\nIf you have not yet created an account, press create one below.")
             else:
                 self.userDb = result
                 tkinter.messagebox.showinfo(title="", message="Logged in successfully!")
-            
-            userField.delete(0, 'end')
-            pwField.delete(0, 'end')
-            self.destroy()
+                self.destroy()
 
         def handleCreate():
             result = db.createLogin(userField.get(), pwField.get())
@@ -49,11 +48,14 @@ class HomeFrame(tk.Frame):
     def __init__(self, parent=None, userDb=None, **config):
         tk.Frame.__init__(self, parent, config)
         self.userDb = userDb
+        self.switchTo = None
 
         def handleDeposit():
-            tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
+            self.switchTo = "deposit"
+            self.destroy()
 
         def handleLogout():
+            self.switchTo = "logout"
             self.destroy()
 
         # Element creation.
@@ -73,17 +75,26 @@ class HomeFrame(tk.Frame):
 class DepositFrame(tk.Frame):
     def __init__(self, parent=None, db=None, **config):
         tk.Frame.__init__(self, parent, config)
+        self.userDb = db
+        self.switchTo = None
 
         def handleDeposit():
-            tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
+            success = self.userDb.addBalance(float(depositField.get()))
+            if success:
+                tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
+                strBalance = "{:.2f}".format(self.userDb.balance)
+                balLabel.configure(text=f"Current Balance: £{strBalance}")
+            else:
+                tkinter.messagebox.showerror(title="", message="Failed to deposit!")
             depositField.delete(0, 'end')
 
         def handleBack():
-            tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
-            depositField.delete(0, 'end')
+            self.switchTo = 'main'
+            self.destroy()
 
         # Element creation.
-        balLabel = tk.Label(self, text="Current Balance: £10")
+        strBalance = "{:.2f}".format(self.userDb.balance)
+        balLabel = tk.Label(self, text=f"Current Balance: £{strBalance}")
         depositField = bEntry(self)
 
         depositButton = bButton(self, text="Deposit", command=handleDeposit)
