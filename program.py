@@ -37,7 +37,7 @@ def HomeLoop(userDb):
             case 'transfer':
                 pass
             case 'details':
-                pass
+                switchFrame = DetailsFrame(root, userDb)
         
         switchFrame.place(relx=0.5, rely=0.5, anchor="c")
         root.wait_window(switchFrame)
