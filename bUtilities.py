@@ -49,7 +49,7 @@ class dbIO:
             for row in reader:
                 if row['username'] == username:
                     if row['password'] == password:
-                        return userDbEntry(row)
+                        return userDbEntry(self, row)
             return False
 
     def createLogin(self, username, password):
