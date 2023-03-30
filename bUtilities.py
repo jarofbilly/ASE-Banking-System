@@ -25,7 +25,7 @@ class userDbEntry:
 
     def addBalance(self, value):
         if value >= 0:
-            updatedBal = self.db.updateBalance(self.username, self.password, value)
+            updatedBal = self.db.updateBalance(self.id, abs(value))
             if updatedBal:
                 self.balance = updatedBal
                 return True
@@ -33,10 +33,18 @@ class userDbEntry:
     
     def subBalance(self, value):
         if value >= 0:
-            updatedBal = self.db.updateBalance(self.username, self.password, -abs(value))
+            updatedBal = self.db.updateBalance(self.id, -abs(value))
             if updatedBal:
                 self.balance = updatedBal
                 return True
+        return False
+
+    def transfer(self, to, value):
+        if value >= 0:
+            updatedBal = self.db.updateBalance(self.id, -abs(value))
+            self.db.updateBalance(to, abs(value))
+            self.balance = updatedBal
+            return True
         return False
 
 class dbIO:
@@ -79,7 +87,7 @@ class dbIO:
         
         return True
     
-    def updateBalance(self, username, password, value):
+    def updateBalance(self, id, value):
         tempfile = NamedTemporaryFile(mode='w', delete=False)
         updated = False
         fieldNames = ["id", "username", "password", "balance"]
@@ -89,7 +97,7 @@ class dbIO:
             writer = csv.DictWriter(tempfile, fieldNames)
 
             for row in reader:
-                if row['username'] == username and row['password'] == password:
+                if row['id'] == id:
                     row['balance'] = float(row['balance']) + value
                     print(row['balance'])
                     updated = float(row['balance'])

@@ -62,6 +62,10 @@ class HomeFrame(tk.Frame):
             self.switchTo = "details"
             self.destroy()
 
+        def handleTransfer():
+            self.switchTo = "transfer"
+            self.destroy()
+
         def handleLogout():
             self.switchTo = "logout"
             self.destroy()
@@ -69,7 +73,7 @@ class HomeFrame(tk.Frame):
         # Element creation.
         depositButton = bButton(self, text="Deposit", command=handleDeposit)
         withdrawButton = bButton(self, text="Withdraw", command=handleWithdraw)
-        transferButton = bButton(self, text="Transfer", command=handleDeposit)
+        transferButton = bButton(self, text="Transfer", command=handleTransfer)
         detailsButton = bButton(self, text="View summary", command=handleDetails)
         logoutButton = bButton(self, text="Log out", command=handleLogout)
 
@@ -171,3 +175,44 @@ class DetailsFrame(tk.Frame):
         userLabel.grid(row=1, column=0, columnspan=2, pady=2)
         balLabel.grid(row=2, column=0, columnspan=2, pady=2)
         backButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
+
+class TransferFrame(tk.Frame):
+    def __init__(self, parent=None, db=None, **config):
+        tk.Frame.__init__(self, parent, config)
+        self.userDb = db
+        self.switchTo = None
+
+        def handleTransfer():
+            success = self.userDb.transfer(transferIdField.get(), float(transferAmountField.get()))
+            if success:
+                tkinter.messagebox.showinfo(title="", message="Task completed successfully!")
+                strBalance = "{:.2f}".format(self.userDb.balance)
+                balLabel.configure(text=f"Current Balance: £{strBalance}")
+            else:
+                tkinter.messagebox.showerror(title="", message="Failed to transfer!")
+            transferIdField.delete(0, 'end')
+            transferAmountField.delete(0, 'end')
+
+        def handleBack():
+            self.switchTo = 'main'
+            self.destroy()
+
+        # Element creation.
+        strBalance = "{:.2f}".format(self.userDb.balance)
+        balLabel = tk.Label(self, text=f"Current Balance: £{strBalance}")
+        transferIdLabel = tk.Label(self, text="Recipient ID")
+        transferAmountLabel = tk.Label(self, text="Amount")
+        transferIdField = bEntry(self)
+        transferAmountField = bEntry(self)
+
+        transferButton = bButton(self, text="Transfer", command=handleTransfer)
+        backButton = bButton(self, text="Back to home", command=handleBack)
+
+        # Placement.
+        balLabel.grid(row=0, column=0, columnspan=2, pady=2)
+        transferIdLabel.grid(row=1, column=0, pady=2)
+        transferIdField.grid(row=1, column=1, pady=2)
+        transferAmountLabel.grid(row=2, column=0, pady=2)
+        transferAmountField.grid(row=2, column=1, pady=2)
+        transferButton.grid(row=3, column=0, columnspan=2, pady=2, sticky='ew')
+        backButton.grid(row=4, column=0, columnspan=2, pady=2, sticky='ew')
